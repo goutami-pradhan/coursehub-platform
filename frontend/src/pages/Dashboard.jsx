@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
-
-import { getCourses } from "../services/courseService";
-
+import Sidebar from "../components/Sidebar";
 import CourseCard from "../components/CourseCard";
+import { getCourses } from "../services/courseService";
+import { getEnrollments } from "../services/enrollmentService";
+import "../styles/dashboard.css";
+
+
 
 const Dashboard = () => {
 
-    const [courses,setCourses]=useState([]);
+    const [courses, setCourses] = useState([]);
+    const [search, setSearch] = useState("");
+    const [enrollments, setEnrollments] = useState([]);
 
-    const role=localStorage.getItem("role");
+    const role = localStorage.getItem("role");
+    const userName = localStorage.getItem("name");
 
-    const loadCourses=async()=>{
+    const loadCourses = async () => {
 
-        try{
+        try {
 
-            const response=await getCourses();
+            const response = await getCourses();
 
             setCourses(response.data.data);
 
         }
 
-        catch(error){
+        catch (error) {
 
             console.log(error);
 
@@ -28,64 +34,174 @@ const Dashboard = () => {
 
     };
 
-    useEffect(()=>{
+ useEffect(() => {
 
-        loadCourses();
+    loadCourses();
 
-    },[]);
+    if (role === "student") {
 
-    return(
+        loadEnrollments();
 
-        <div style={{padding:"30px"}}>
+    }
 
-            <h1>
+}, []);
 
-                CourseHub Dashboard
+    const filteredCourses = courses.filter(course =>
+        course.title.toLowerCase().includes(search.toLowerCase())
+    );
 
-            </h1>
+    const loadEnrollments = async () => {
 
-            <h3>
+    try {
 
-                Logged in as {role}
+        const response = await getEnrollments();
 
-            </h3>
+        setEnrollments(response.data.data);
 
-            <hr/>
+    } catch (error) {
 
-            <div style={{
+        console.log(error);
 
-                display:"flex",
+    }
 
-                flexWrap:"wrap",
+};
 
-                gap:"20px"
+    return (
 
-            }}>
+        <>
 
-            {
+            <Sidebar />
 
-                courses.map(course=>(
+            <div className="dashboard">
 
-                    <CourseCard
+                <div className="dashboard-header">
 
-                        key={course._id}
+                    <div>
 
-                        course={course}
+                        <h2>
 
-                        loadCourses={loadCourses}
+                            Welcome,
+
+                            {userName}
+
+                        </h2>
+
+                        <p>
+
+                            Manage your learning journey
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div className="stats">
+
+                    <div className="stat-card">
+
+                        <i className="bi bi-book stat-icon"></i>
+
+                        <h3>
+
+                            {courses.length}
+
+                        </h3>
+
+                        <p>Total Courses</p>
+
+                    </div>
+
+                    <div className="stat-card">
+
+                        <i className="bi bi-person-fill stat-icon"></i>
+
+                        <h3>
+
+                            {role === "admin" ? "Admin" : "Student"}
+
+                        </h3>
+
+                        <p>Logged In As</p>
+
+                    </div>
+
+                    <div className="stat-card">
+
+                        <i className="bi bi-mortarboard-fill stat-icon"></i>
+
+                        <h3>
+
+                            {courses.length}
+
+                        </h3>
+
+                        <p>Available Courses</p>
+
+                    </div>
+
+                    <div className="stat-card">
+
+                        <i className="bi bi-award-fill stat-icon"></i>
+
+                        <h3>
+
+                            0%
+
+                        </h3>
+
+                        <p>Completion</p>
+
+                    </div>
+
+                </div>
+
+                <div className="search-section">
+
+                    <input
+
+                        type="text"
+
+                        placeholder="Search Courses..."
+
+                        value={search}
+
+                        onChange={(e) => setSearch(e.target.value)}
 
                     />
 
-                ))
+                </div>
 
-            }
+                <div className="course-grid">
+
+                    {
+
+                        filteredCourses.map(course => (
+
+                            <CourseCard
+
+                                key={course._id}
+
+                                course={course}
+
+                                loadCourses={loadCourses}
+
+                                enrollments={enrollments}
+
+                            />
+
+                        ))
+
+                    }
+
+                </div>
 
             </div>
 
-        </div>
+        </>
 
     );
 
-}
+};
 
 export default Dashboard;

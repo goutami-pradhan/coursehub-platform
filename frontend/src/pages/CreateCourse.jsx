@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { createCourse } from "../services/courseService";
 
+import { toast } from "react-toastify";
+
 const CreateCourse = () => {
 
     const [course, setCourse] = useState({
@@ -40,7 +42,7 @@ const CreateCourse = () => {
 
             await createCourse(course);
 
-            alert("Course Created Successfully");
+            toast.success("Course Created Successfully");
 
             window.location = "/dashboard";
 
@@ -48,7 +50,7 @@ const CreateCourse = () => {
 
         catch (error) {
 
-            alert(error.response?.data?.message);
+            toast.error(error.response?.data?.message);
 
         }
 

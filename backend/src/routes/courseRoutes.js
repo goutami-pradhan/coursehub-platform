@@ -46,6 +46,8 @@ router.put(
     updateCourse
 );
 
+//router.get("/:id", protect, getCourseById);
+
 // Admin Only
 router.delete(
     "/:id",

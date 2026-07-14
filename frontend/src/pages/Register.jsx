@@ -1,17 +1,25 @@
 import { useState } from "react";
-
 import { registerUser } from "../services/authService";
+import { toast } from "react-toastify";
+import { useNavigate, Link } from "react-router-dom";
+import "../styles/auth.css";
 
 const Register = () => {
 
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [form, setForm] = useState({
-
         name: "",
-
         email: "",
-
-        password: ""
-
+        password: "",
+        confirmPassword: "",
+        role: "student"
     });
 
     const handleChange = (e) => {
@@ -30,82 +38,198 @@ const Register = () => {
 
         e.preventDefault();
 
+        if (!form.name || !form.email || !form.password) {
+
+            toast.error("Please fill all fields");
+
+            return;
+
+        }
+
+        if (form.password !== form.confirmPassword) {
+
+            toast.error("Passwords do not match");
+
+            return;
+
+        }
+
+        setLoading(true);
+
         try {
 
-            await registerUser(form);
+            const payload = {
 
-            alert("Registration Successful");
+                name: form.name,
 
-            window.location = "/";
+                email: form.email,
+
+                password: form.password,
+
+                role: form.role
+
+            };
+
+            await registerUser(payload);
+
+            toast.success("Registration Successful");
+
+            navigate("/");
 
         }
 
         catch (error) {
 
-            alert(error.response?.data?.message || "Registration Failed");
+            toast.error(
+
+                error.response?.data?.message ||
+
+                "Registration Failed"
+
+            );
 
         }
 
-    }
+        setLoading(false);
+
+    };
 
     return (
 
-        <div style={{ padding: "30px" }}>
+        <div className="auth-page">
 
-            <h2>Create Account</h2>
+            <div className="auth-card">
 
-            <form onSubmit={handleSubmit}>
+                <h1 className="logo">
 
-                <input
+                    🎓 CourseHub LMS
 
-                    name="name"
+                </h1>
 
-                    placeholder="Name"
+                <p className="subtitle">
 
-                    onChange={handleChange}
+                    Learn • Track • Grow
 
-                />
+                </p>
 
-                <br /><br />
+                <h2>Create Account</h2>
 
-                <input
+                <form onSubmit={handleSubmit}>
 
-                    name="email"
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Full Name"
+                        value={form.name}
+                        onChange={handleChange}
+                    />
 
-                    placeholder="Email"
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email Address"
+                        value={form.email}
+                        onChange={handleChange}
+                    />
 
-                    onChange={handleChange}
+                    <div className="password-box">
 
-                />
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={handleChange}
+                        />
 
-                <br /><br />
+                        <span
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? "🙈" : "👁"}
+                        </span>
 
-                <input
+                    </div>
 
-                    type="password"
+                    <div className="password-box">
 
-                    name="password"
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            placeholder="Confirm Password"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
+                        />
 
-                    placeholder="Password"
+                        <span
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? "🙈" : "👁"}
+                        </span>
 
-                    onChange={handleChange}
+                    </div>
 
-                />
+                    <select
+                        name="role"
+                        value={form.role}
+                        onChange={handleChange}
+                        className="role-select"
+                    >
 
-                <br /><br />
+                        <option value="student">
 
-                <button>
+                            Student
 
-                    Register
+                        </option>
 
-                </button>
+                        <option value="admin">
 
-            </form>
+                            Admin
+
+                        </option>
+
+                    </select>
+
+                    <button
+                        className="login-btn"
+                        disabled={loading}
+                    >
+
+                        {
+
+                            loading
+
+                                ?
+
+                                "Creating Account..."
+
+                                :
+
+                                "Register"
+
+                        }
+
+                    </button>
+
+                </form>
+
+                <p>
+
+                    Already have an account?
+
+                    <Link to="/">
+
+                        Login
+
+                    </Link>
+
+                </p>
+
+            </div>
 
         </div>
 
-    )
+    );
 
-}
+};
 
 export default Register;

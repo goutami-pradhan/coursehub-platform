@@ -1,0 +1,83 @@
+.details-container{
+
+    padding:40px;
+
+    background:#f4f7fb;
+
+    min-height:100vh;
+
+}
+
+.back-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 22px;
+
+    border-radius:8px;
+
+    margin-bottom:25px;
+
+}
+
+.details-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:25px;
+
+}
+
+.info-card{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
+
+.progress-card{
+
+    margin-top:30px;
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
+
+.action-card{
+
+    margin-top:30px;
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
+
+.action-card button{
+
+    margin-right:15px;
+
+    margin-top:15px;
+
+}

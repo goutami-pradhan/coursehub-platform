@@ -8,14 +8,37 @@ const jwt = require("jsonwebtoken");
 const registerUser = async (req, res) => {
     try {
 
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+    return res.status(400).json({
+        success: false,
+        message: "Name, Email and Password are required."
+    });
+}
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(email)) {
+    return res.status(400).json({
+        success: false,
+        message: "Invalid email format."
+    });
+}
+
+if (password.length < 10) {
+    return res.status(400).json({
+        success: false,
+        message: "Password should be at least 10 characters."
+    });
+}
 
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
-                message: "User already exists"
+                message: "User already exists with this email."
             });
         }
 
@@ -25,7 +48,7 @@ const registerUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: role || "student"
+            role: "student"
         });
 
         res.status(201).json({
@@ -60,13 +83,20 @@ const loginUser = async (req, res) => {
 
         const { email, password } = req.body;
 
+        if (!email || !password) {
+    return res.status(400).json({
+        success: false,
+        message: "Email and Password are required."
+    });
+}
+
         const user = await User.findOne({ email });
 
         if (!user) {
 
             return res.status(401).json({
                 success: false,
-                message: "Invalid Credentials"
+                message: "Invalid email or password"
             });
 
         }
@@ -77,7 +107,7 @@ const loginUser = async (req, res) => {
 
             return res.status(401).json({
                 success: false,
-                message: "Invalid Credentials"
+                message: "Invalid email or password."
             });
 
         }
@@ -123,7 +153,7 @@ const loginUser = async (req, res) => {
 
             success: false,
 
-            message: "Server Error"
+            message: "Something went wrong. Please try again later."
 
         });
 
@@ -140,6 +170,18 @@ const getProfile = async (req, res) => {
     try {
 
         const user = await User.findById(req.user.id).select("-password");
+
+        if (!user) {
+
+    return res.status(404).json({
+
+        success: false,
+
+        message: "User not found."
+
+    });
+
+}
 
         res.json({
 

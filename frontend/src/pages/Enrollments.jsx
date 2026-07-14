@@ -4,10 +4,13 @@ import {
     getEnrollments,
     updateEnrollment
 } from "../services/enrollmentService";
+import { toast } from "react-toastify";
+import AdminBoard from "./AdminBoard";
 
 const Enrollments = () => {
 
     const [enrollments, setEnrollments] = useState([]);
+    console.log("Enrollment State:", enrollments);
 
     const role = localStorage.getItem("role");
 
@@ -16,6 +19,9 @@ const Enrollments = () => {
         try {
 
             const response = await getEnrollments();
+
+            console.log("Enrollments API Response:", response.data);
+
 
             setEnrollments(response.data.data);
 
@@ -41,7 +47,7 @@ const Enrollments = () => {
 
             await updateEnrollment(id, status);
 
-            alert("Status Updated Successfully");
+            toast.success("Status Updated Successfully");
 
             loadEnrollments();
 
@@ -49,7 +55,7 @@ const Enrollments = () => {
 
         catch (error) {
 
-            alert(error.response?.data?.message);
+            toast.error(error.response?.data?.message);
 
         }
 
@@ -57,137 +63,73 @@ const Enrollments = () => {
 
     return (
 
-        <div style={{ padding: "30px" }}>
+    role === "admin"
 
-            <h1>
+        ? (
 
-                {role === "admin"
+            <AdminBoard
 
-                    ? "Student Enrollments"
+                enrollments={enrollments}
 
-                    : "My Enrollments"}
+                loadEnrollments={loadEnrollments}
 
-            </h1>
+            />
 
-            <hr />
+        )
 
-            {
+        : (
 
-                enrollments.map((enrollment) => (
+            <div style={{ padding: "30px" }}>
 
-                    <div
+                <h1>My Enrollments</h1>
 
-                        key={enrollment._id}
+                <hr />
 
-                        style={{
+                {
 
-                            border: "1px solid gray",
+                    enrollments.map((enrollment) => (
 
-                            padding: "20px",
+                        <div
 
-                            marginBottom: "20px",
+                            key={enrollment._id}
 
-                            borderRadius: "8px"
+                            style={{
 
-                        }}
+                                border: "1px solid gray",
 
-                    >
+                                padding: "20px",
 
-                        <h3>
+                                marginBottom: "20px",
 
-                            {enrollment.course.title}
+                                borderRadius: "8px"
 
-                        </h3>
+                            }}
 
-                        <p>
+                        >
 
-                            Student :
+                            <h3>{enrollment.course.title}</h3>
 
-                            {enrollment.student.name}
+                            <p>Instructor : {enrollment.course.instructor}</p>
 
-                        </p>
+                            <p>
 
-                        <p>
+                                Status :
 
-                            Instructor :
+                                <b>{enrollment.status}</b>
 
-                            {enrollment.course.instructor}
+                            </p>
 
-                        </p>
+                        </div>
 
-                        <p>
+                    ))
 
-                            Status :
+                }
 
-                            <b>
+            </div>
 
-                                {enrollment.status}
+        )
 
-                            </b>
-
-                        </p>
-
-                        {
-
-                            role === "admin" &&
-
-                            <>
-
-                                <button
-
-                                    onClick={() =>
-
-                                        changeStatus(
-
-                                            enrollment._id,
-
-                                            "Approved"
-
-                                        )
-
-                                    }
-
-                                >
-
-                                    Approve
-
-                                </button>
-
-                                {" "}
-
-                                <button
-
-                                    onClick={() =>
-
-                                        changeStatus(
-
-                                            enrollment._id,
-
-                                            "Rejected"
-
-                                        )
-
-                                    }
-
-                                >
-
-                                    Reject
-
-                                </button>
-
-                            </>
-
-                        }
-
-                    </div>
-
-                ))
-
-            }
-
-        </div>
-
-    );
+);
 
 };
 

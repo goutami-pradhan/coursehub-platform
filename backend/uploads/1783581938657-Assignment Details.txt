@@ -1,0 +1,8 @@
+ Assignment category: Billable
+ Customer name: JUNIPER United States
+ Project name: Spyglass AMS 2
+ Claim ID:  WJ63Y
+ Start date: 11-10-2025
+ End date: 12-31-2026
+ Hours per week: 45.0
+ Availability date: 01-01-2027

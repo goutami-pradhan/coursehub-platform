@@ -1,8 +1,16 @@
 import { useState } from "react";
-
 import { loginUser } from "../services/authService";
+import { toast } from "react-toastify";
+import { useNavigate, Link } from "react-router-dom";
+import "../styles/auth.css";
 
 const Login = () => {
+
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState({
 
@@ -28,94 +36,154 @@ const Login = () => {
 
         e.preventDefault();
 
+        if (!form.email || !form.password) {
+
+            toast.error("Please fill all fields");
+
+            return;
+
+        }
+
+        setLoading(true);
+
         try {
 
             const response = await loginUser(form);
 
-            localStorage.setItem(
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("role", response.data.user.role);
+            localStorage.setItem("name", response.data.user.name);
 
-                "token",
+            toast.success("Welcome " + response.data.user.name);
 
-                response.data.token
-
-            );
-
-            localStorage.setItem(
-
-                "role",
-
-                response.data.user.role
-
-            );
-
-            alert("Login Successful");
-
-            window.location = "/dashboard";
+            navigate("/dashboard");
 
         }
 
         catch (error) {
 
-            alert(error.response?.data?.message || "Login Failed");
+            toast.error(
+                error.response?.data?.message || "Login Failed"
+            );
 
         }
 
-    }
+        setLoading(false);
+
+    };
 
     return (
 
-        <div style={{ padding: "30px" }}>
+        <div className="auth-page">
 
-            <h2>CourseHub Login</h2>
+            <div className="auth-card">
 
-            <form onSubmit={handleSubmit}>
+                <h1 className="logo">
 
-                <input
+                    🎓 CourseHub LMS
 
-                    name="email"
+                </h1>
 
-                    placeholder="Email"
+                <p className="subtitle">
 
-                    onChange={handleChange}
+                    Learn • Track • Grow
 
-                />
+                </p>
 
-                <br /><br />
+                <h2>
 
-                <input
+                    Welcome Back
 
-                    type="password"
+                </h2>
 
-                    name="password"
+                <form onSubmit={handleSubmit}>
 
-                    placeholder="Password"
+                    <input
 
-                    onChange={handleChange}
+                        type="email"
 
-                />
+                        placeholder="Email"
 
-                <br /><br />
+                        name="email"
 
-                <button>
+                        value={form.email}
 
-                    Login
+                        onChange={handleChange}
 
-                </button>
+                    />
 
-            </form>
+                    <div className="password-box">
 
-            <br />
+                        <input
 
-            <a href="/register">
+                            type={showPassword ? "text" : "password"}
 
-                Create Account
+                            placeholder="Password"
 
-            </a>
+                            name="password"
+
+                            value={form.password}
+
+                            onChange={handleChange}
+
+                        />
+
+                        <span
+
+                            onClick={() => setShowPassword(!showPassword)}
+
+                        >
+
+                            {showPassword ? "🙈" : "👁"}
+
+                        </span>
+
+                    </div>
+
+                    <button
+
+                        className="login-btn"
+
+                        disabled={loading}
+
+                    >
+
+                        {
+
+                            loading
+
+                            ?
+
+                            "Logging in..."
+
+                            :
+
+                            "Login"
+
+                        }
+
+                    </button>
+
+                </form>
+
+                <p>
+
+                    Don't have an account?
+
+                    <Link to="/register">
+
+                        Register
+
+                    </Link>
+
+                </p>
+
+            </div>
 
         </div>
 
     );
 
-}
+};
 
 export default Login;

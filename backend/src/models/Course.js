@@ -45,6 +45,17 @@ const courseSchema = new mongoose.Schema({
         default: "Beginner"
     },
 
+    attachments: [
+    {
+        fileName: {
+            type: String
+        },
+        fileUrl: {
+            type: String
+        }
+    }
+],
+
     createdBy: {
 
         type: mongoose.Schema.Types.ObjectId,

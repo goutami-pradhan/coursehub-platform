@@ -26,13 +26,47 @@ const enrollmentSchema = new mongoose.Schema({
 
         type: String,
 
-        enum: ["Pending", "Approved", "Rejected"],
+        enum: [ "Pending",
+        "Approved",
+        "In Progress",
+        "Completed"],
 
         default: "Pending"
 
+    },
+     progress: {
+        type: Number,
+        default: 0
+    },
+
+    comments: [
+    {
+        message: {
+            type: String
+        },
+        user: {
+            type: String
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
     }
+],
+documents: [
+    {
+        fileName: String,
+        filePath: String,
+        uploadedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }
+],
 
 },
+
+
 {
       enrolledAt: {
         type: Date,

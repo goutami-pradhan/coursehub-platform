@@ -1,9 +1,26 @@
 import { enrollCourse } from "../services/enrollmentService";
 import { deleteCourse } from "../services/courseService";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "./CourseCard.css";
 
-const CourseCard = ({ course, loadCourses }) => {
+
+const CourseCard = ({
+    course,
+    loadCourses,
+    enrollments
+}) => {
 
     const role = localStorage.getItem("role");
+    const navigate = useNavigate();
+    const enrollment = enrollments?.find(
+
+    e => e.course._id === course._id
+
+);
+console.log("Course:", course._id);
+console.log("Enrollments:", enrollments);
+console.log("Matched:", enrollment);
 
     const enroll = async () => {
 
@@ -11,13 +28,20 @@ const CourseCard = ({ course, loadCourses }) => {
 
             await enrollCourse(course._id);
 
-            alert("Course Enrolled Successfully");
+            toast.success("Course Enrolled Successfully");
+           setTimeout(() => {
+
+    window.location.reload();
+
+}, 500);
 
         }
 
         catch (error) {
 
-            alert(error.response?.data?.message);
+            toast.error(
+                error.response?.data?.message || "Enrollment Failed"
+            );
 
         }
 
@@ -31,7 +55,7 @@ const CourseCard = ({ course, loadCourses }) => {
 
             await deleteCourse(course._id);
 
-            alert("Course Deleted");
+            toast.success("Course Deleted Successfully");
 
             loadCourses();
 
@@ -39,7 +63,9 @@ const CourseCard = ({ course, loadCourses }) => {
 
         catch (error) {
 
-            alert(error.response?.data?.message);
+            toast.error(
+                error.response?.data?.message || "Delete Failed"
+            );
 
         }
 
@@ -47,79 +73,148 @@ const CourseCard = ({ course, loadCourses }) => {
 
     return (
 
-        <div style={{
+       <div className="course-card">
 
-            border:"1px solid gray",
+<div className="course-image">
 
-            borderRadius:"10px",
+📘
 
-            padding:"20px",
+</div>
 
-            marginBottom:"20px",
+<div className="course-body">
 
-            width:"350px"
+            {/* Course Title */}
 
-        }}>
+<h3 className="course-title">
+                {course.title}
 
-            <h2>{course.title}</h2>
+            </h3>
 
-            <p>{course.description}</p>
+            {/* Description */}
 
-            <p>
+            <p className="course-desc">
 
-                <b>Instructor :</b>
-
-                {course.instructor}
-
-            </p>
-
-            <p>
-
-                <b>Duration :</b>
-
-                {course.duration}
+                {course.description}
 
             </p>
 
+            {/* Level */}
+
+            <div className="course-info">
+
+<span className="badge-level">
+
+{course.level}
+
+</span>
+
+<span>
+
+⭐ 4.8
+
+</span>
+
+</div>
+
+            {/* Instructor */}
+
             <p>
 
-                <b>Level :</b>
+👨 {course.instructor}
 
-                {course.level}
+</p>
 
-            </p>
+            {/* Duration */}
 
-            <p>
+           <p>
 
-                <b>Price :</b>
+⏰ {course.duration}
 
-                ₹ {course.price}
+</p>
 
-            </p>
+            {/* Price */}
+<div className="price">
+
+₹ {course.price}
+
+</div>
+
+            <hr />
+
+            {/* Buttons */}
 
             {
+                role === "student" ? (
 
-                role==="student"
+                        <div className="button-group">
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => navigate(`/course/${course._id}`)}
+                        >
+                            View Details
+                        </button>
 
-                ?
+                       {
+    enrollment ?
 
-                <button onClick={enroll}>
+    <button
+        className="btn btn-secondary"
+        disabled
+    >
 
-                    Enroll Now
+        ✅ {enrollment.status}
 
-                </button>
+    </button>
 
-                :
+    :
+ (
 
-                <button onClick={removeCourse}>
+        <button
+            className="btn btn-success"
+            onClick={enroll}
+        >
+            Enroll Course
+        </button>
 
-                    Delete
+    )
+}
 
-                </button>
 
+                    </div>
+
+                ) : (
+
+                   <div className="d-grid gap-2">
+
+    <button
+        className="btn btn-primary"
+        onClick={() => navigate(`/course/${course._id}`)}
+    >
+        View Details
+    </button>
+
+    <button
+        className="btn btn-warning"
+        onClick={() => navigate(`/edit-course/${course._id}`)}
+    >
+        Edit Course
+    </button>
+
+    <button
+        className="btn btn-danger"
+        onClick={removeCourse}
+    >
+        Delete Course
+    </button>
+
+</div>
+
+                )
             }
 
-        </div>
+    </div>
+
+</div>
 
     );
 
